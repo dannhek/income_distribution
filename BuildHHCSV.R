@@ -24,29 +24,30 @@ options(survey.replicates.mse = TRUE)
 dbfolder <- paste0( getwd() , "/MonetDB" )
 db <- dbConnect( MonetDBLite() , dbfolder )
 
-query2015 <- "select h_idnum1, h_year, max(hwsval) 
+query2015 <- "select h_idnum1, h_year, max(hwsval), max(htotval), max(h_numper) 
                from asec15 where hwsval <> 0 group by h_idnum1,h_year"
 df2015 <- dbGetQuery(db, query2015)
 
 
-query2010 <- "select h_idnum1, h_year, max(hwsval) 
+query2010 <- "select h_idnum1, h_year, max(hwsval), max(htotval), max(h_numper) 
                from asec10 where hwsval <> 0 group by h_idnum1,h_year"
 df2010 <- dbGetQuery(db, query2010)
 
 
-query2005 <- "select h_idnum1, h_year, max(hwsval)           
+query2005 <- "select h_idnum1, h_year, max(hwsval), max(htotval), max(h_numper)           
                from asec05 where hwsval <> 0 group by h_idnum1,h_year"
 df2005 <- dbGetQuery(db, query2005)
 
 
-query2000 <- "select h_idnum as 'h_idnum1', h_year, max(hwsval)           
+query2000 <- "select h_idnum, h_year, max(hwsval), max(htotval), max(h_numper)           
                from asec00 where hwsval <> 0 group by h_idnum,h_year"
 df2000 <- dbGetQuery(db, query2000)
 
-names(df2000) <- c("h_id","year","h_income")
-names(df2005) <- c("h_id","year","h_income")
-names(df2010) <- c("h_id","year","h_income")
-names(df2015) <- c("h_id","year","h_income")
+
+names(df2000) <- c("h_id","year","h_wages","h_income","h_size")
+names(df2005) <- c("h_id","year","h_wages","h_income","h_size")
+names(df2010) <- c("h_id","year","h_wages","h_income","h_size")
+names(df2015) <- c("h_id","year","h_wages","h_income","h_size")
 
 ##Adjust for Inflation
 setwd("~/R Income Distribution/CPS Data")
@@ -60,7 +61,11 @@ cf <- as.data.frame(cf)
 rownames(cf) <- year(rownames(cf))
 names(cf) <- "cpi_adj"
 dfFull <- merge(dfFull,cf,by.x="year",by.y="row.names")
-dfFull$adj_h_income <- dfFull$h_income * dfFull$cpi_adj
+dfFull$adj_h_income <- (dfFull$h_income / dfFull$cpi_adj) 
+
+##Adjust for Household Size
+dfFull <- subset(dfFull,h_size > 0)
+dfFull$adj_h_income <- dfFull$adj_h_income / sqrt(dfFull$h_size)
 
 ##Write to File
 write.csv(dfFull, "hhwagessalary.csv")
