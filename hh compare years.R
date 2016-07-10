@@ -71,15 +71,32 @@ ddply(df,~year+seclass,summarise,minincome=min(adj_h_income),maxincome=max(adj_h
 tbl<-ddply(df, ~ year+seclass, summarise,numAdults=sum(h_num_adults))
 tbl<-dcast(tbl,year~seclass,sum) ; rownames(tbl)<-tbl$year
 tbl$year <- NULL ; tbl<-tbl/rowSums(tbl) ; tbl$year <- rownames(tbl)
-adultClassProps <- melt(tbl, id="year") 
-adultClassProps <- mutate(group_by(adultClassProps,year),pos=cumsum(value)-.5*value)
-names(adultClassProps) <- c("year","income","prop","pos")
+ClassProps <- melt(tbl, id="year") 
+ClassProps <- mutate(group_by(ClassProps,year),pos=cumsum(value)-.5*value)
+names(ClassProps) <- c("year","income","prop","pos")
 
-classes <- ggplot(data=adultClassProps,aes(fill=income,x=year,y=prop)) +
+adult.income.class <- ggplot(data=ClassProps,aes(fill=income,x=year,y=prop)) +
      geom_bar(stat="identity") + 
-     geom_text(y=adultClassProps$pos,aes(label=paste0(round(100*prop),"%")),size=2) +
-     coord_flip() 
-classes
+     geom_text(y=ClassProps$pos,aes(label=paste0(round(100*prop),"%")),size=2) +
+     coord_flip() + ggtitle("Distribution of Adults by Income Class") +
+     xlab("Proportion") + ylab("Year")
+adult.income.class
+
+
+#Graph 4 - All Population Class Distribution
+tbl<-ddply(df, ~ year+seclass, summarise,numAdults=sum(h_size))
+tbl<-dcast(tbl,year~seclass,sum) ; rownames(tbl)<-tbl$year
+tbl$year <- NULL ; tbl<-tbl/rowSums(tbl) ; tbl$year <- rownames(tbl)
+ClassProps <- melt(tbl, id="year") 
+ClassProps <- mutate(group_by(ClassProps,year),pos=cumsum(value)-.5*value)
+names(ClassProps) <- c("year","income","prop","pos")
+
+pop.income.class <- ggplot(data=ClassProps,aes(fill=income,x=year,y=prop)) +
+     geom_bar(stat="identity") + 
+     geom_text(y=ClassProps$pos,aes(label=paste0(round(100*prop),"%")),size=2) +
+     coord_flip() + ggtitle("Distribution of Whole Population by Income Class") +
+     xlab("Proportion") + ylab("Year")
+pop.income.class
 
 
 
@@ -91,13 +108,13 @@ classes
 
 
 
-#Graph 4 - Household Size Distribution 
+#Graph 5 - Household Size Distribution 
 hSizeHist <- ggplot(data=df, aes(x=h_size)) +
      geom_histogram() +
      facet_grid(. ~ year)
 hSizeHist
 
-#Graph 5 - Household Size Distribution - Adults Only
+#Graph 6 - Household Size Distribution - Adults Only
 hSizeHist <- ggplot(data=df, aes(x=h_num_adults)) +
      geom_histogram(binwidth=1) +
      facet_grid(. ~ year) +

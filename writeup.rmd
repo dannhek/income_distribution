@@ -2,28 +2,89 @@
 title: "Where is the Middle Class Going?"
 author: "Dann Hekman"
 date: "June 17, 2016"
+header-includes:
+   - \usepackage{amsmath}
+   - \usepackage{units}
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+source("hh compare years.R") #https://github.com/dannhek/income_distribution/blob/master/hh%20compare%20years.R
+library(pander)
 ```
+##Executive Summary
 ##Background and Data Source
-We've heard for quite some time that the middle class is in crisis and shrinking. But what to do the data say? Where *is* the middle class going? Is the middle class in crisis? What does that crisis look like in the data?
+We've heard for quite some time that the middle class is in crisis and shrinking. But what to do the data say? Where *is* the middle class going? Is the middle class in crisis? What does that crisis look like in the data?  
 
-Data for these exploration come from the Current Population Survey (CPS) Annual Social and Economic Supplement (ASEC). The CPS ASEC is a longitudinal survey of 50,000 households conducted by the US Census Bureau<sup>[1](#citation1)</sup>. Despite the relatively small sample size, this dataset is regularly used for income analysis and other demographic trends. Data were downloaded and pulled into R using code from All Survey Data Free from Anthony Damico<sup>[2](#citation2)</sup>.
+Data for these exploration come from the Current Population Survey (CPS) Annual Social and Economic Supplement (ASEC). The CPS ASEC is a longitudinal survey of 50,000 households conducted by the US Census Bureau<sup>[1](#citation1)</sup>. Despite the relatively small sample size, this dataset is regularly used for income analysis and other demographic trends. Data were downloaded and pulled into R using code from All Survey Data Free from Anthony Damico<sup>[2](#citation2)</sup>.  
 
 ##Data Scrubbing
-Data were processed using the same steps as Pew Research Center's 2015 report, [America's Middle Class is Losing Ground](http://www.pewsocialtrends.org/2015/12/09/the-american-middle-class-is-losing-ground/#fn-21084-10). First, CPS ASEC data were pulled for the years 2000, 2005, 2010, 2015 were downloaded<sup>[2](#footnote2)</sup>. Second, Total Income<sup>[3](#citation3)</sup>, was adjusted for inflation to 2015 USD using the `quantmod`<sup>[4](#citation4)</sup> to get Consumer Price Index (CPI) data from the [Federal Reserve of St. Louis](https://fred.stlouisfed.org/). 
+Data were processed using the same steps as Pew Research Center's 2015 report, America's Middle Class is Losing Ground<sup>[6](#citation6)</sup>. First, CPS ASEC data were pulled for the years 2000, 2005, 2010, 2015 were downloaded<sup>[2](#citation2)</sup>. Second, Total Income<sup>[3](#citation3)</sup>, was adjusted for inflation to 2015 USD using the `quantmod`<sup>[4](#citation4)</sup> to get Consumer Price Index (CPI) data from the [Federal Reserve of St. Louis](https://fred.stlouisfed.org/). 
 
 Finally, household income was adjusted for household size. Intuitively, we know that one two people live together, their household income is the sum of each individual's earnings, but many expenses (most notably lodging) is shared. So a household of 2 does not have double the expenses of a household of 1. To adjust for this lifestyle, the standard adjustment is to divide total household income by the square root of household size<sup>[5](#citation5)</sup>. In other words, a two person household will have 1.41 times the expenses as a single person household rather than twice.
 
+After income was standardized across all households in the dataset, Socio-economic class was calculated using the same definition as Pew<sup>[6](#citation6)</sup>: middle income is 2/3 to 2 times the median (adjusted) income. Anying above two times median income is considered "upper" income, and anything below two-thirds of median income is "lower" income.  
+
+##Findings
+First, like Pew<sup>[6](#citation6)</sup>, I found that the middle class is shrinking, at least in terms of people living in each income class.  
+```{r classDisp1, out.width='450cm', out.height='450cm', fig.show='hold'}
+adult.income.class
+```
+```{r classDisp2, out.width='450cm', out.height='450cm', fig.show='hold'}
+pop.income.class
+```    
+
+These proportions are slightly different than those found by Pew<sup>[6](#citation6)</sup>, but close enough for my purposes. My larger purpose is to look more in detail at how the distribution in income is changing. First, we can see that income is, as expected, heavily skewed to the right, but the distributions are not identical year-to-year.   
+
+```{r incomeDisp1}
+allyears
+```    
+
+We can zoom in to see the gaps between these distribution curves, which is really what I'm trying to find. Which income levels are more prevalent, and which income levels are less prevalent than they used to be?  
+
+```{r incomeDistDisp1, out.width='450cm', out.height='450cm', fig.show='hold'}
+getYearComparison(df,2000,2015)
+```
+```{r incomeDistDisp2, out.width='450cm', out.height='450cm', fig.show='hold'}
+getYearComparison(df,2010,2015)
+```  
+
+##Conclusion
+Stuff isn't as bad as it might seem.
+
+
+#Appendix: Code
+All code is available on Github at [github.com/dannhek/income_distribution](https://github.com/dannhek/income_distribution). Below is a scattering of key pieces of code.
+
+```{r sql_query1, eval=FALSE,echo=TRUE}
+#Retrieve Data from MonetDB SQL Database using dbQuery
+query2015 <- "select h_idnum1
+                    ,h_year
+                    ,max(hwsval)
+                    ,max(htotval)
+                    ,max(h_numper)
+                    ,max(h_numper-hunder18)
+                    ,sum(case when earner=1 then 1 else 0 end)
+               from asec15 where htotval > 0 group by h_idnum1,h_year"
+df2015 <- dbGetQuery(db, query2015)
+#From BuildHHCSV.r
+```
+```{r variable_list, echo=FALSE}
+#resultant variables
+dfvarnames   <- names(df)
+asecvarnames <- c("N/A","h_year","h_idnum1","hwsval","htotval","h_numper","h_numper-hunder18","earner","[FRED Data]","[Calculated Value]","[Calculated Value]")
+descvarnames <- c("Observation counter","Survey year","Household Identifier","Household income from Wages or Salary in the previous calendar year","Total household income in the previous calendar year","Number of people (all ages) living in household","Number of adults (18+) living in household","Number of people earning some income in household","Annual CPI adjustment factor","(h_income / cpi_adj) / sqrt(h_size)","Social Economic Class, as defined by Pew.")
+pander(data.frame(R_Variable_Name=dfvarnames,ASEC_Variable_Source=asecvarnames,Variable_Description=descvarnames))
+```
 
 
 
-
-<a name="citation1">1</a>: [https://www.census.gov/did/www/saipe/data/model/info/cpsasec.html]
-<a name="citation2">2</a>: [https://github.com/ajdamico/asdfree/tree/master/Current%20Population%20Survey]
-<a name="citation3">3</a>: Variable htotval from the [CPS Data Dictionary](https://www.census.gov/prod/techdoc/cps/cpsmar13.pdf)
-<a name="citation4">4</a>: http://www.quantmod.com/documentation/getSymbols.html
-<a name="citation5">5</a>: http://www.econtalk.org/archives/2012/04/burkhauser_on_t.html
+<a name="citation1">1</a>: [https://www.census.gov/did/www/saipe/data/model/info/cpsasec.html]  
+<a name="citation2">2</a>: [https://github.com/ajdamico/asdfree/tree/master/Current%20Population%20Survey]  
+<a name="citation3">3</a>: Variable htotval from the [CPS Data Dictionary](https://www.census.gov/prod/techdoc/cps/cpsmar13.pdf)  
+<a name="citation4">4</a>: [http://www.quantmod.com/documentation/getSymbols.html]  
+<a name="citation5">5</a>: [http://www.econtalk.org/archives/2012/04/burkhauser_on_t.html]  
+<a name="citation6">6</a>:
+[http://www.pewsocialtrends.org/2015/12/09/the-american-middle-class-is-losing-ground/#fn-21084-10]  
