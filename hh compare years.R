@@ -1,4 +1,5 @@
-library(ggplot2) ; library(scales)
+library(ggplot2) ; library(scales) ; library(RColorBrewer) 
+library(plyr) ; library(dplyr) ; library(reshape2)
 setwd("~/R Income Distribution")
 df <- read.csv("CPS Data/hhwagessalary.csv")
 
@@ -16,41 +17,91 @@ for (yr in c('2015', '2010', '2005', '2000')) {
           upper=med*2)
           )
 }
-getClass <- function(income,year,compare) {
-     compare <- subset(compare,year==year)
-     if (income < compare$lower) return("lower")
-     if (income >=compare$upper) return("upper")
-     else (return("middle"))
-}
-for (i in c(1:nrow(df))) {
-     df$seclass[i] <- getClass(df$adj_h_income[i],df$year[i],ses.bounds)
-}
+# getClass <- function(income,year,compare) {
+#      compare <- subset(compare,year==year)
+#      if (income < compare$lower) return("lower")
+#      if (income >=compare$upper) return("upper")
+#      else (return("middle"))
+# }
+# for (i in c(1:nrow(df))) {
+#      df$seclass[i] <- getClass(df$adj_h_income[i],df$year[i],ses.bounds)
+# }
+# 
+linecolors  <- brewer.pal(4,"Set1")
+
 
 
 #Graph 1 - All years
-allyears <- ggplot(df, aes(x=adj_h_income, colour=year)) +
-               geom_density() +
-               xlim(0,750000) +
-               geom_vline(xintercept = mean(df$adj_h_income), colour="black") +
-               geom_vline(xintercept = median(df$adj_h_income), colour="blue")
+allyears <- ggplot(df, aes(x=adj_h_income, colour=year)) + geom_density() +
+     ggtitle("Adjusted Household Income Distribution Over Time") +
+     xlab("Adjusted Household Income (2015 USD)") +
+     ylab("Density") + 
+     scale_x_continuous(labels=comma,limits=c(0,500000),
+                        breaks=c(0,50000,100000,200000,300000,400000,500000))+
+     scale_y_continuous(labels=comma)
+
 allyears
 
-#Graph 2 - 2015 compared to 2000
-dist1 <- density(subset(df,year == 2000, adj_h_income)$adj_h_income,from=0,to=1000000)
-dist2 <- density(subset(df,year == 2015, adj_h_income)$adj_h_income,from=0,to=1000000)
-df1    <-data.frame(x=dist1$x,y=dist2$y-dist1$y)
-compareYears <- ggplot() +
-     scale_x_continuous(limits=c(0,750000),labels=comma,breaks=seq(0,750000,by=50000)) +
-     geom_line(data=df1,aes(x,y),size=1,colour="black")   +
-     geom_area(data=subset(df1,y>0),aes(x=x,y=y),alpha=0.5,fill="lightgreen")+
-     geom_area(data=subset(df1,y<0),aes(x=x,y=y),alpha=0.5,fill="pink")+
-     geom_hline(yintercept=0)+
-     geom_vline(xintercept=ses.bounds$median[1])
 
-compareYears
+#Graph 2 - 2015 compared to Previous Years
+getYearComparison <- function(df,year1=2000,year2=2015) {
+     dist1 <- density(subset(df,year == year1, adj_h_income)$adj_h_income,from=0,to=1000000)
+     dist2 <- density(subset(df,year == year2, adj_h_income)$adj_h_income,from=0,to=1000000)
+     df1    <-data.frame(x=dist1$x,y=dist2$y-dist1$y) ; df1$pos <- df1$y>0
+     
+     compareYears <- ggplot(data=df1) +
+          geom_line(aes(x=x,y=y),size=1,colour="black")   +
+          geom_area(aes(x=x,y=ifelse(y>0,y,0),ymin=0),alpha=0.5,fill="lightgreen")+
+          geom_area(aes(x=x,y=ifelse(y<0,y,0),ymax=0),alpha=0.5,fill="pink")+
+          geom_hline(yintercept=0)+
+          ggtitle(paste0("Changes in Income Distribution Between ",year1," and ",year2)) +
+          xlab("Adjusted Household Income (2015 USD)") +
+          ylab("Difference in Distribution Density") +
+          scale_x_continuous(labels=comma,limits=c(0,500000),breaks=c(0,50000,100000,200000,300000,400000,500000)) +
+          scale_y_continuous(labels=comma)
+     
+     compareYears
+}
+getYearComparison(df)
 
-#Graph 3 - Class Distribution
-classes <- ggplot() +
-     geom_bar(data=df,aes(fill=seclass,x=year),position="fill") + 
-     coord_flip() #+ geom_text(aes(label=percent))
+
+ddply(df,~year+seclass,summarise,minincome=min(adj_h_income),maxincome=max(adj_h_income),medincom=median(adj_h_income),avgsize=mean(h_size))
+
+#Graph 3 - Adult Class Distribution
+tbl<-ddply(df, ~ year+seclass, summarise,numAdults=sum(h_num_adults))
+tbl<-dcast(tbl,year~seclass,sum) ; rownames(tbl)<-tbl$year
+tbl$year <- NULL ; tbl<-tbl/rowSums(tbl) ; tbl$year <- rownames(tbl)
+adultClassProps <- melt(tbl, id="year") 
+adultClassProps <- mutate(group_by(adultClassProps,year),pos=cumsum(value)-.5*value)
+names(adultClassProps) <- c("year","income","prop","pos")
+
+classes <- ggplot(data=adultClassProps,aes(fill=income,x=year,y=prop)) +
+     geom_bar(stat="identity") + 
+     geom_text(y=adultClassProps$pos,aes(label=paste0(round(100*prop),"%")),size=2) +
+     coord_flip() 
 classes
+
+
+
+
+
+
+
+
+
+
+
+#Graph 4 - Household Size Distribution 
+hSizeHist <- ggplot(data=df, aes(x=h_size)) +
+     geom_histogram() +
+     facet_grid(. ~ year)
+hSizeHist
+
+#Graph 5 - Household Size Distribution - Adults Only
+hSizeHist <- ggplot(data=df, aes(x=h_num_adults)) +
+     geom_histogram(binwidth=1) +
+     facet_grid(. ~ year) +
+     xlim(0,10)
+hSizeHist
+
+ddply(df, ~ year+seclass, summarise, hsize=mean(h_size),numAdults=mean(h_num_adults),numEarners=mean(h_num_earners))

@@ -1,0 +1,29 @@
+---
+title: "Where is the Middle Class Going?"
+author: "Dann Hekman"
+date: "June 17, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##Background and Data Source
+We've heard for quite some time that the middle class is in crisis and shrinking. But what to do the data say? Where *is* the middle class going? Is the middle class in crisis? What does that crisis look like in the data?
+
+Data for these exploration come from the Current Population Survey (CPS) Annual Social and Economic Supplement (ASEC). The CPS ASEC is a longitudinal survey of 50,000 households conducted by the US Census Bureau<sup>[1](#citation1)</sup>. Despite the relatively small sample size, this dataset is regularly used for income analysis and other demographic trends. Data were downloaded and pulled into R using code from All Survey Data Free from Anthony Damico<sup>[2](#citation2)</sup>.
+
+##Data Scrubbing
+Data were processed using the same steps as Pew Research Center's 2015 report, [America's Middle Class is Losing Ground](http://www.pewsocialtrends.org/2015/12/09/the-american-middle-class-is-losing-ground/#fn-21084-10). First, CPS ASEC data were pulled for the years 2000, 2005, 2010, 2015 were downloaded<sup>[2](#footnote2)</sup>. Second, Total Income<sup>[3](#citation3)</sup>, was adjusted for inflation to 2015 USD using the `quantmod`<sup>[4](#citation4)</sup> to get Consumer Price Index (CPI) data from the [Federal Reserve of St. Louis](https://fred.stlouisfed.org/). 
+
+Finally, household income was adjusted for household size. Intuitively, we know that one two people live together, their household income is the sum of each individual's earnings, but many expenses (most notably lodging) is shared. So a household of 2 does not have double the expenses of a household of 1. To adjust for this lifestyle, the standard adjustment is to divide total household income by the square root of household size<sup>[5](#citation5)</sup>. In other words, a two person household will have 1.41 times the expenses as a single person household rather than twice.
+
+
+
+
+
+<a name="citation1">1</a>: [https://www.census.gov/did/www/saipe/data/model/info/cpsasec.html]
+<a name="citation2">2</a>: [https://github.com/ajdamico/asdfree/tree/master/Current%20Population%20Survey]
+<a name="citation3">3</a>: Variable htotval from the [CPS Data Dictionary](https://www.census.gov/prod/techdoc/cps/cpsmar13.pdf)
+<a name="citation4">4</a>: http://www.quantmod.com/documentation/getSymbols.html
+<a name="citation5">5</a>: http://www.econtalk.org/archives/2012/04/burkhauser_on_t.html
