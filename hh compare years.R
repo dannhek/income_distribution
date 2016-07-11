@@ -58,9 +58,10 @@ getYearComparison <- function(df,year1=2000,year2=2015) {
           xlab("Adjusted Household Income (2015 USD)") +
           ylab("Difference in Distribution Density") +
           scale_x_continuous(labels=comma,limits=c(0,500000),breaks=c(0,50000,100000,200000,300000,400000,500000)) +
-          scale_y_continuous(labels=comma)
+          scale_y_continuous(labels=comma) +
+          scale_fill_brewer(palette="Set3")
      
-     compareYears
+     list(graph=compareYears,dataframe=df1)
 }
 getYearComparison(df)
 
@@ -121,4 +122,22 @@ hSizeHist <- ggplot(data=df, aes(x=h_num_adults)) +
      xlim(0,10)
 hSizeHist
 
-ddply(df, ~ year+seclass, summarise, hsize=mean(h_size),numAdults=mean(h_num_adults),numEarners=mean(h_num_earners))
+hSizeHist <- ggplot(data=df, aes(x=h_num_fams)) +
+     geom_histogram(binwidth=1) +
+     facet_grid(. ~ year) +
+     xlim(0,10)
+hSizeHist
+
+demoMeans <- melt(ddply(df, ~ year+seclass, summarise, hsize=mean(h_size),numAdults=mean(h_num_adults),numEarners=mean(h_num_earners),numFamilies=mean(h_num_fams)))
+levels(demoMeans$variable) <- c("All Persons","Num. Adults","Num. Workers","Num. Family Units")
+demoMeanPlot <- ggplot(data=demoMeans, aes(x=year,y=value,fill=seclass)) +
+     geom_bar(stat="identity", position="dodge") +
+     facet_grid(. ~ variable) +
+     scale_fill_brewer(palette="Set2") +
+     xlab("Year") + theme(axis.text.x = element_text(angle=45,hjust=1))+
+     ylab("Average") + ggtitle("Household Sizes by Income Class Over Time")
+demoMeanPlot
+
+anova(lm(h_num_fams~year,data=subset(df,seclass=="upper",TRUE)))
+
+pairwise.t.test(df$h_num_fams,df$seclass)

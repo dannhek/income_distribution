@@ -25,33 +25,33 @@ dbfolder <- paste0( getwd() , "/MonetDB" )
 db <- dbConnect( MonetDBLite() , dbfolder )
 
 query2015 <- "select h_idnum1, h_year, max(hwsval), max(htotval), 
-               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end)
+               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end), max(hnumfam)
                from asec15 where htotval > 0 group by h_idnum1,h_year"
 df2015 <- dbGetQuery(db, query2015)
 
 
 query2010 <- "select h_idnum1, h_year, max(hwsval), max(htotval), 
-               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end)
+               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end), max(hnumfam)
                from asec10 where htotval > 0 group by h_idnum1,h_year"
 df2010 <- dbGetQuery(db, query2010)
 
 
 query2005 <- "select h_idnum1, h_year, max(hwsval), max(htotval), 
-               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end)        
+               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end), max(hnumfam)     
                from asec05 where htotval > 0 group by h_idnum1,h_year"
 df2005 <- dbGetQuery(db, query2005)
 
 
 query2000 <- "select h_idnum, h_year, max(hwsval), max(htotval), 
-               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end)          
+               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end), max(hnumfam)        
                from asec00 where htotval > 0 group by h_idnum,h_year"
 df2000 <- dbGetQuery(db, query2000)
 
 
-names(df2000) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners")
-names(df2005) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners")
-names(df2010) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners")
-names(df2015) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners")
+names(df2000) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners","h_num_fams")
+names(df2005) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners","h_num_fams")
+names(df2010) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners","h_num_fams")
+names(df2015) <- c("h_id","year","h_wages","h_income","h_size","h_num_adults","h_num_earners","h_num_fams")
 
 ##Adjust for Inflation
 setwd("~/R Income Distribution/CPS Data")

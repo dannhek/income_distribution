@@ -83,3 +83,15 @@ classes
 }
 classesGraph(df,h_size)
 
+
+
+
+query2015 <- "select h_idnum1, h_year, max(hwsval), max(htotval), 
+               max(h_numper), max(h_numper-hunder18), sum(case when earner=1 then 1 else 0 end)
+from asec15 where htotval > 0 group by h_idnum1,h_year"
+df2015 <- dbGetQuery(db, query2015)
+
+
+dbGetQuery(db,"select count(*) from asec15 where frecord=1")
+dbGetQuery(db,"select count(*) from asec15 where hrecord=1")
+dbGetQuery(db,"select count(*) from asec15 where precord=1")
