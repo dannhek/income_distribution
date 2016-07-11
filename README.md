@@ -3,13 +3,19 @@ This repo exists to support a project that stemmed from a friendly debate with m
 
 After adjusting to a common inflation standard, I use R's GGPLOT2 package to take a density of the distribution, and then take the difference in densities over time. This creates a map of how the US income distribution is changing in 5 year increments.  
 
-To Do and Document  
+##Structure of Files
+This repo contains 4 main files:  
 
-* Finish ReadME
-* Clean up Graphs
-* Clean up code
-* Knitr Writeup and Economic interpretation
+- BuildHHCSV.R - this file downloads CPS ASEC Data if needed, parses it, and then saves the fields I care about into a CSV File that gets saved to the working directory.
+- hh compare years.R - this file is the real workhorse of the analysis. For performance and ease of use, it runs entirely on the CSV file generated in BuildHHCSV. 
+- hhwagesalary.csv - data file built by BuildHHCSV and used by hh compare years.
+- writeup.rmd - the final report writeup. It calls hh compare years using the R `source` command, but primarily contains text and only contains code needed for demonstration and explanation purposes. 
 
-#Resources
-* [ASDFree.org](http://www.ASDFree.org) and [github.com/ajdamico](https://github.com/ajdamico/asdfree/tree/master/Current%20Population%20Survey) to pull data
-* 
+##Citations
+RPubs: 
+Github: https://github.com/dannhek/income_distribution
+
+
+Other citations....
+
+
