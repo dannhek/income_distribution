@@ -139,7 +139,7 @@ Whatever populists say, yes, the middle class is shrinking. Inequality is real, 
 
 This all implies that maybe, just maybe, free market capitalism is doing what free markets do best: expand opulence for more people than are harmed by free trade and free markets. This is not to say that everything is perfect and rosey. Obviously, there are serious social challenges facing America today, and inequality has complicated and real ethical and moral concerns. However, the populist nightmare that the middle class is becoming poorer to the benefit of the upper classes of society does not appear to be one of those challenges.  
 
-#<a name=AppendixA>Apprndix A</a>: Future Directions  
+#<a name=AppendixA>Appendix A</a>: Future Directions  
 For better or for worse, I'm a busy guy, and this is--for now--just a hobby. I hope to add to this investigation as I have time, but in the meantime, I encourage readers to fork my [repo](https://github.com/dannhek/income_distribution/blob/master/README.md) and add some of the following adjustments and considerations I wish I had time to include:  
 
 * Adjustment for Cost of Living, or at least calculating median (and therefore class) by region or FIPS code. This will almost certainly require a new, larger dataset, but is worth exploring given the urbanization of millenials.  
@@ -208,5 +208,5 @@ getYearComparison <- function(df,year1=2000,year2=2015) {
 <a name="citation3">3</a>: Variable htotval from the [CPS Data Dictionary](https://www.census.gov/prod/techdoc/cps/cpsmar13.pdf)  
 <a name="citation4">4</a>: Ryan, J. A.; Ulrich, J. M.; Thielen, W. (2015). Quantmod. CRAN Package.   https://cran.r-project.org/web/packages/quantmod/quantmod.pdf
 <a name="citation5">5</a>: Burkhauser, R. (2012). Podcast interview with Russ Roberts. Retrieved from http://www.econtalk.org/archives/2012/04/burkhauser_on_t.html  
-<a name="citation6">6</a>: Kochhar, R.; Fry, R.; Rohal, M. (2015). The American Middle Class is Losing Ground. Pew Research Center. Retrieved from http://www.pewsocialtrends.org/files/2015/12/2015-12-09_middle-class_FINAL-report.pdf
+<a name="citation6">6</a>: Kochhar, R.; Fry, R.; Rohal, M. (2015). The American Middle Class is Losing Ground. Pew Research Center. Retrieved from http://www.pewsocialtrends.org/files/2015/12/2015-12-09_middle-class_FINAL-report.pdf  
 <a name="citation7">7</a>: Planet Money. (2016). Episode 682: When CEO Pay Exploded. Retrieved from http://www.npr.org/sections/money/2016/02/05/465747726/-682-when-ceo-pay-exploded
