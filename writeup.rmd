@@ -149,7 +149,8 @@ For better or for worse, I'm a busy guy, and this is--for now--just a hobby. I h
 
 
 #Appendix B: Code
-All code is available on Github at [github.com/dannhek/income_distribution](https://github.com/dannhek/income_distribution/blob/master/README.md). Below is a scattering of key pieces of code.
+All code is available on Github at [github.com/dannhek/income_distribution](https://github.com/dannhek/income_distribution/blob/master/README.md). Below is a scattering of key pieces of code.  
+
 ####SQL Query used to get a subset of the data from MonetDB
 ```{r sql_query1, eval=FALSE,echo=TRUE, results='asis'}
 #Retrieve Data from MonetDB SQL Database using dbQuery

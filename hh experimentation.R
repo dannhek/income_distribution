@@ -100,7 +100,7 @@ dbGetQuery(db,"select count(*) from asec15 where precord=1")
 #Push to WordPress
 
 if (!require('RWordPress'))
-     install.packages('RWordPress', repos = 'http://www.omegahat.org/R', type = 'source')
+     install.packages('RWordPress', repos = 'https://www.omegahat.org/R', type = 'source')
 library(RWordPress)
 options(WordpressLogin = c(tattooedeconomist = passwordVariableSetFromPrompt),
         WordpressURL = 'http://user.wordpress.com/xmlrpc.php')
