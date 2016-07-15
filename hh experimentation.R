@@ -95,3 +95,16 @@ df2015 <- dbGetQuery(db, query2015)
 dbGetQuery(db,"select count(*) from asec15 where frecord=1")
 dbGetQuery(db,"select count(*) from asec15 where hrecord=1")
 dbGetQuery(db,"select count(*) from asec15 where precord=1")
+
+
+#Push to WordPress
+
+if (!require('RWordPress'))
+     install.packages('RWordPress', repos = 'http://www.omegahat.org/R', type = 'source')
+library(RWordPress)
+options(WordpressLogin = c(tattooedeconomist = passwordVariableSetFromPrompt),
+        WordpressURL = 'http://user.wordpress.com/xmlrpc.php')
+library(knitr)
+knit2wp('yourfile.Rmd', title = 'Your post title')
+
+
