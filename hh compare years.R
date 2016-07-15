@@ -80,7 +80,7 @@ adult.income.class <- ggplot(data=ClassProps,aes(fill=income,x=year,y=prop)) +
      geom_bar(stat="identity") + 
      geom_text(y=ClassProps$pos,aes(label=paste0(round(100*prop),"%")),size=2) +
      coord_flip() + ggtitle("Distribution of Adults by Income Class") +
-     xlab("Proportion") + ylab("Year")
+     ylab("Proportion of Adults") + xlab("Year")
 adult.income.class
 
 
@@ -96,7 +96,7 @@ pop.income.class <- ggplot(data=ClassProps,aes(fill=income,x=year,y=prop)) +
      geom_bar(stat="identity") + 
      geom_text(y=ClassProps$pos,aes(label=paste0(round(100*prop),"%")),size=2) +
      coord_flip() + ggtitle("Distribution of Whole Population by Income Class") +
-     xlab("Proportion") + ylab("Year")
+     ylab("Proportion of Whole Population") + xlab("Year")
 pop.income.class
 
 
